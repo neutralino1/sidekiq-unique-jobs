@@ -48,10 +48,13 @@ module SidekiqUniqueJobs
         protected
 
         def payload_hash(item)
-          SidekiqUniqueJobs::PayloadHelper.get_payload(item['class'], item['queue'], item['args'])
+          payload = SidekiqUniqueJobs::PayloadHelper.get_payload(item['class'], item['queue'], item['args'])
+          logger.info "Payload has for #{item} is #{payload}"
+          payload
         end
 
         def unlock(payload_hash)
+          logger.info "Unlocking #{payload_hash}"
           if redis_pool
             redis_pool.with { |conn| conn.del(payload_hash) }
           else
